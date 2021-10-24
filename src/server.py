@@ -54,6 +54,7 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
 
         try:
             conn = self._pool.get_connection()
+            conn.auto_reconnect = True
             cursor = conn.cursor()
 
             cursor.execute("SELECT path, rotation, modified_timestamp " +
@@ -69,9 +70,12 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
             if row:
                 path, rotation, modified = row
                 
+                # TODO Need to figure out action view and action download
+
                 photo_bytes = self._get_photo(
                     path, rotation, modified, values.get("size"))
 
+                # TODO: Optimize?
                 photo_bytes.seek(0, os.SEEK_END)
                 size = photo_bytes.tell()
                 photo_bytes.seek(0, 0)
