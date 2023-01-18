@@ -116,7 +116,7 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
             image = Image.open("/mnt/photos/" + path)
 
             if factor:
-                image = image.rotate(rotate * -1, expand=1).reduce(factor)
+                image = image.reduce(factor).rotate(rotate, expand=1)
             elif boxWidth and boxHeight:
                 rotatedWidth = image.width
                 rotatedHeight = image.height
@@ -131,7 +131,7 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
                 targetWidth = rotatedWidth / ratio
                 targetHeight = rotatedHeight / ratio
 
-                image = image.rotate(rotate, expand=1).resize((int(targetWidth), int(targetHeight)))
+                image = image.resize((int(targetWidth), int(targetHeight))).rotate(rotate, expand=1)
                 
             photo_bytes = io.BytesIO()
             image.save(photo_bytes, "jpeg")
@@ -140,7 +140,7 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
         else:
             photo_bytes = io.BytesIO(open("/mnt/photos/" + path, "rb").read())
 
-        return photo_bytes;
+        return photo_bytes
 
 
     def _get_transforms(self, size):
