@@ -1,6 +1,7 @@
 import os
 import io
 import sys
+import uuid
 import urllib
 import threading
 from socketserver import ThreadingMixIn
@@ -70,8 +71,6 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
             if row:
                 path, rotation, modified = row
                 
-                # TODO Need to figure out action view and action download
-
                 photo_bytes = self._get_photo(
                     path, rotation, modified, values.get("size"))
 
@@ -83,6 +82,11 @@ class ImageTransformHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-Type', 'image/jpeg')
                 self.send_header('Content-Length', size)
+
+                if values.get('action') == 'download':
+                    filename = values.get('name') or f'photo-{uuid.uuid4()}.jpg'
+                    self.send_header('Content-Disposition', f'attachment; filename="{filename}"')
+
                 self.end_headers()
 
                 self.wfile.write(photo_bytes.read())
